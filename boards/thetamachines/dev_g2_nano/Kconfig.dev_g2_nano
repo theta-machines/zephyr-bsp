@@ -1,0 +1,6 @@
+# Copyright 2026 Theta Machines
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_DEV_G2_NANO
+    select SOC_PART_NUMBER_MIMXRT1176DVMAA
+    select SOC_MIMXRT1176_CM7

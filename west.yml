@@ -1,0 +1,17 @@
+manifest:
+  remotes:
+    - name: zephyrproject
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject
+      revision: v4.4.2
+      import:
+        name-allowlist:
+          - cmsis_6
+          - hal_nxp
+          - hal_st
+
+  self:
+    path: thetamachines

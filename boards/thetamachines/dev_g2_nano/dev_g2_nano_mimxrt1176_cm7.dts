@@ -1,0 +1,202 @@
+/*
+ * Copyright 2026 Theta Machines
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+
+#include <nxp/imxrt/nxp_rt1170_cm7.dtsi>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/sensor/lsm6dsv16x.h>
+
+#include "dev_g2_nano-pinctrl.dtsi"
+
+/* Delete SoC's existing OCRAM definitions (redefine in &ram) */
+/delete-node/ &ocram;
+/delete-node/ &ocram1;
+/delete-node/ &ocram2;
+
+/ {
+    model = "Theta Machines DEV-G2-NANO";
+    compatible = "nxp,mimxrt1176";
+
+    aliases {
+        led0 = &user_led;
+        sw0 = &user_button;
+        imu0 = &lsm6dsv;
+        rtmc-g2 = &rtmc_g2;
+        rtmc-g2-reset = &rtmc_g2_reset;
+    };
+
+    chosen {
+        zephyr,flash = &w25q64jw;
+        zephyr,flash-controller = &ext_flash_ctrl;
+
+        zephyr,sram = &sram;
+        zephyr,itcm = &itcm;
+        zephyr,dtcm = &dtcm;
+
+        zephyr,console = &lpuart11;
+        zephyr,shell-uart = &lpuart11;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+
+        user_led: led0 {
+            gpios = <&gpio2 25 GPIO_ACTIVE_HIGH>;
+        };
+
+        /* TODO: this shouldn't be in leds */
+        rtmc_g2_reset: rtmc-g2-reset {
+            gpios = <&gpio2 29 GPIO_ACTIVE_LOW>;
+        };
+    };
+
+    gpio_keys {
+        compatible = "gpio-keys";
+
+        user_button: button0 {
+            gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;
+            zephyr,code = <INPUT_KEY_0>;
+        };
+    };
+
+    soc {
+        sram: sram@20200000 {
+            compatible = "mmio-sram";
+            reg = <0x20200000 DT_SIZE_K(1536)>;
+        };
+    };
+};
+
+/* FlexSPI channel to flash memory */
+&flexspi {
+    status = "okay";
+    ahb-prefetch;
+    ahb-read-addr-opt;
+    reg = <0x400cc000 0x4000>, <0x30000000 DT_SIZE_M(8)>;
+
+    ext_flash_ctrl: flash-controller@0 {
+        status = "okay";
+        compatible = "nxp,imx-flexspi-nor";
+        size = <DT_SIZE_M(8*8)>;
+        reg = <0>;
+        spi-max-frequency = <DT_FREQ_M(133)>;
+        jedec-id = [ef 60 17];
+
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges = <0x0 0x30000000 DT_SIZE_M(8)>;
+
+        w25q64jw: flash@0 {
+            compatible = "soc-nv-flash";
+            reg = <0x0 DT_SIZE_M(8)>;
+            erase-block-size = <DT_SIZE_K(4)>;
+            write-block-size = <1>;
+        };
+    };
+};
+
+/* SPI channel to RTMC Core */
+&lpspi1 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_lpspi1>;
+    pinctrl-names = "default";
+
+    rtmc_g2: rtmc-g2@0 {
+        compatible = "vnd,spi-device";
+        reg = <0>; /* Use CS 0 */
+        spi-max-frequency = <DT_FREQ_M(1)>;
+    };
+};
+
+/* SPI channel to IMU and magnetometer */
+&lpspi5 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_lpspi5>;
+    pinctrl-names = "default";
+
+    /* Set CS pins */
+    cs-gpios = <&gpio6 6 GPIO_ACTIVE_LOW>;
+
+    /* IMU */
+    lsm6dsv: lsm6dsv@0 {
+        status = "okay";
+        compatible = "st,lsm6dsv16x";
+        reg = <0>; /* Use cs-gpios[0] */
+        spi-max-frequency = <DT_FREQ_M(10)>;
+
+        int1-gpios = <&gpio2 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+
+        accel-range = <LSM6DSV16X_DT_FS_4G>;
+        accel-odr = <LSM6DSVXXX_DT_ODR_AT_60Hz>;
+
+        gyro-range = <LSM6DSV16X_DT_FS_500DPS>;
+        gyro-odr = <LSM6DSVXXX_DT_ODR_AT_60Hz>;
+
+        sflp-odr = <LSM6DSVXXX_DT_SFLP_ODR_AT_60Hz>;
+        sflp-fifo-enable = <LSM6DSVXXX_DT_SFLP_FIFO_GAME_ROTATION>;
+
+        /*
+            Generate interrupt (int1-gpio) when FIFO contains `fifo-watermark`
+            rows.
+
+            Approximate interrupt rate (f_int):
+                f_int = sflp-odr / fifo-watermark
+
+            For example,
+                f_int = (60 Hz) / (2 rows)
+                f_int = 30 Hz
+        */
+        fifo-watermark = <2>;
+    };
+};
+
+/* SDIO channel to MAYA-W1 */
+&usdhc2 {
+    status = "okay";
+    pinctrl-0 = <&pinmux_usdhc2>;
+    pinctrl-names = "default";
+
+    /* 50 MHz for DDR50 mode */
+    max-bus-freq = <DT_FREQ_M(50)>;
+
+    maya_w1: maya-w1 {
+        compatible = "nxp,wifi";
+        status = "okay";
+
+        /*
+            Module power-down pin (PDn)
+
+            Use GPIO_ACTIVE_HIGH because nxp_wifi_drv.c already uses inverted
+            logic
+        */
+        pwr-gpios = <&gpio7 9 GPIO_ACTIVE_HIGH>;
+
+        /* Module WLAN_RESET pin */
+        sd-gpios = <&gpio10 5 GPIO_ACTIVE_HIGH>;
+    };
+};
+
+/* UART channel to MAYA-W1 */
+&lpuart2 {
+    status = "okay";
+    current-speed = <115200>;
+    pinctrl-0 = <&pinmux_lpuart2>;
+    pinctrl-names = "default";
+};
+
+/* UART channel to USB/UART bridge */
+&lpuart11 {
+    status = "okay";
+    current-speed = <115200>;
+    pinctrl-0 = <&pinmux_lpuart11>;
+    pinctrl-names = "default";
+};
+
+/* Enable M7 core's SysTick timer */
+&systick {
+    status = "okay";
+};

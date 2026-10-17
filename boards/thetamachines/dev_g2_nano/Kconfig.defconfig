@@ -1,0 +1,16 @@
+# Copyright 2026 Theta Machines
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_DEV_G2_NANO
+    if WIFI
+        config WIFI_NXP
+            default y
+
+        choice NXP_WIFI_PART
+            default NXP_IW416
+        endchoice
+
+        config NET_MGMT_EVENT_STACK_SIZE
+            default 2048
+    endif
+endif

@@ -1,0 +1,6 @@
+boards:
+  - name: dev_g2_nano
+    full_name: G2 Nano
+    vendor: thetamachines
+    socs:
+      - name: mimxrt1176

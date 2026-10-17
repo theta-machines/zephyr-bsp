@@ -1,0 +1,3 @@
+# Blob files; keep only license information
+/zephyr/blobs/*
+!/zephyr/blobs/licenses/

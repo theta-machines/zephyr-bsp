@@ -1,0 +1,86 @@
+/*
+ * Copyright 2026 Theta Machines
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <nxp/nxp_imx/rt/mimxrt1176dvmaa-pinctrl.dtsi>
+
+&pinctrl {
+    /* UART channel to USB/UART bridge */
+    pinmux_lpuart11: pinmux_lpuart11 {
+        group0 {
+            pinmux = <&iomuxc_lpsr_gpio_lpsr_09_lpuart11_rx>,
+                <&iomuxc_lpsr_gpio_lpsr_08_lpuart11_tx>;
+            drive-strength = "high";
+            slew-rate = "fast";
+        };
+    };
+
+    /* SPI channel to RTMC Core */
+    pinmux_lpspi1: pinmux_lpspi1 {
+        group0 {
+            pinmux = <&iomuxc_gpio_emc_b2_00_lpspi1_sck>,
+                <&iomuxc_gpio_emc_b2_01_lpspi1_pcs0>,
+                <&iomuxc_gpio_emc_b2_02_lpspi1_sdo>,
+                <&iomuxc_gpio_emc_b2_03_lpspi1_sdi>;
+        };
+    };
+
+    /* SPI channel to IMU and magnetometer */
+    pinmux_lpspi5: pinmux_lpspi5 {
+        group0 {
+            pinmux = <&iomuxc_lpsr_gpio_lpsr_12_lpspi5_sck>,
+                <&iomuxc_lpsr_gpio_lpsr_05_lpspi5_sdi>,
+                <&iomuxc_lpsr_gpio_lpsr_04_lpspi5_sdo>;
+            drive-strength = "high";
+            slew-rate = "fast";
+        };
+    };
+
+    /* SDIO channel to MAYA-W1 */
+    pinmux_usdhc2: pinmux_usdhc2 {
+        group0 {
+            pinmux = <&iomuxc_gpio_sd_b2_04_usdhc2_clk>;
+            drive-strength = "high";
+            slew-rate = "fast";
+        };
+        
+        /* Bidirectional pins with pull-up resistors */
+        group1 {
+            pinmux = <&iomuxc_gpio_sd_b2_05_usdhc2_cmd>,
+                <&iomuxc_gpio_sd_b2_03_usdhc2_data0>,
+                <&iomuxc_gpio_sd_b2_02_usdhc2_data1>,
+                <&iomuxc_gpio_sd_b2_01_usdhc2_data2>,
+                <&iomuxc_gpio_sd_b2_00_usdhc2_data3>;
+            drive-strength = "high";
+            slew-rate = "fast";
+            bias-pull-up;
+            input-enable;
+        };
+    };
+
+    /* UART channel to MAYA-W1 */
+    pinmux_lpuart2: pinmux_lpuart2 {
+        group0 {
+            pinmux = <&iomuxc_gpio_disp_b2_10_lpuart2_tx>,
+                <&iomuxc_gpio_disp_b2_11_lpuart2_rx>,
+                <&iomuxc_gpio_disp_b2_12_lpuart2_cts_b>;
+            drive-strength = "high";
+            slew-rate = "fast";
+        };
+
+        /*
+            The MAYA-W1 UART_CTSn pin is normally an input, but is asserted
+            LOW when PDn is LOW. Therefore, the microcontroller output should
+            be open-drain with a pull-up resistor to avoid driver contention.
+        */
+        group1 {
+            pinmux = <&iomuxc_gpio_disp_b2_13_lpuart2_rts_b>;
+            drive-strength = "high";
+            slew-rate = "fast";
+            bias-pull-up;
+            drive-open-drain;
+        };
+    };
+};

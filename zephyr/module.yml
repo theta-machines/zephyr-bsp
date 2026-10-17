@@ -1,0 +1,13 @@
+name: thetamachines
+build:
+  settings:
+    board_root: .
+    dts_root: .
+blobs:
+  - path: NXP.MIMXRT1171_DFP.26.09.00.pack
+    version: '26.09.00'
+    url: https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MIMXRT1171_DFP.26.09.00.pack
+    sha256: 86ebfe3935df7434ef2a31e1cc3e23840e7690f511d48678d75ab8ce39c65242
+    type: img
+    license-path: zephyr/blobs/licenses/MIMXRT1171_DFP.txt
+    description: "CMSIS pack used by pyOCD for dev_g2_nano"
