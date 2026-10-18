@@ -1,0 +1,20 @@
+# Copyright 2026 Theta Machines
+# SPDX-License-Identifier: Apache-2.0
+#
+# Use this manifest to pull in required packages only, saving disk space.
+#
+# Using this manifest is not recommended unless you're certain that your
+# project doesn't require any additional packages.
+
+manifest:
+  self:
+    path: thetamachines
+    import:
+      file: west.yml
+      name-allowlist:
+        - zephyr
+        - cmsis_6
+        - hal_nxp
+        - hal_st
+        - mbedtls
+        - tf-psa-crypto

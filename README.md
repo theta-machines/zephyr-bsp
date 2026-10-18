@@ -20,14 +20,24 @@ TODO
         source .venv/bin/activate
         ```
 
-3. Run the following commands:
+3. Install west:
     ```
     pip install west
-    west init -m https://github.com/theta-machines/zephyr-bsp
-    west update --narrow -o=--depth=1
     ```
 
-4. Install Zephyr's Python dependencies:
+4. Initialize west:
+    ```
+    west init -m https://github.com/theta-machines/zephyr-bsp
+    ```
+    * Add `--mf west-minimal.yml` to pull in required modules only (not recommended for most users)
+
+5. Update the packages:
+    ```
+    west update
+    ```
+    * Add `--narrow -o=--depth=1` to ignore Git history (optional, saves disk space)
+
+6. Install Zephyr's Python dependencies:
     * Windows (PowerShell):
         ```
         python -m pip install @((west packages pip) -split ' ')
@@ -38,7 +48,7 @@ TODO
         west packages pip --install
         ```
 
-5. Run the following commands:
+7. Run the following commands:
     ```
     west zephyr-export
     west sdk install -t arm-zephyr-eabi

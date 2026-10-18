@@ -1,3 +1,6 @@
+# Copyright 2026 Theta Machines
+# SPDX-License-Identifier: Apache-2.0
+
 manifest:
   remotes:
     - name: zephyrproject
@@ -7,15 +10,7 @@ manifest:
     - name: zephyr
       remote: zephyrproject
       revision: v4.4.2
-      import:
-        # TODO: should I just allow everything
-        # Might be a better UX
-        name-allowlist:
-          - cmsis_6
-          - hal_nxp
-          - hal_st
-          - mbedtls
-          - tf-psa-crypto
+      import: true
 
   self:
     path: thetamachines
