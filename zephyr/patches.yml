@@ -1,0 +1,7 @@
+patches:
+  - path: uart_mcux_lpuart.c.patch
+    sha256sum: 505a2ef48fe14ae9d71c4b4a8d32b08cafba1ace90e380280ecbbc14739ca9c6
+    module: zephyr
+    author: Ryan Stracener
+    email: ryan.stracener@thetamachines.com
+    date: 2026-10-18

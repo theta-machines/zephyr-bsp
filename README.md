@@ -37,7 +37,12 @@ TODO
     ```
     * Add `--narrow -o=--depth=1` to ignore Git history (optional, saves disk space)
 
-6. Install Zephyr's Python dependencies:
+6. Apply patches:
+    ```
+    west patch apply
+    ```
+
+7. Install Zephyr's Python dependencies:
     * Windows (PowerShell):
         ```
         python -m pip install @((west packages pip) -split ' ')
@@ -48,7 +53,7 @@ TODO
         west packages pip --install
         ```
 
-7. Run the following commands:
+8. Run the following commands:
     ```
     west zephyr-export
     west sdk install -t arm-zephyr-eabi

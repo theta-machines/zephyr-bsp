@@ -1,0 +1,3 @@
+# Ensure Git on Windows doesn't convert patch line endings to CRLF
+# (would break the checksum)
+zephyr/patches/** -text

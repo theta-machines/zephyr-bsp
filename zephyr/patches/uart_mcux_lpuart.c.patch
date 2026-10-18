@@ -1,0 +1,33 @@
+Problem:
+	In 4.4.2, uart_poll_out() returns as soon as a byte is in the LPUART TX
+	FIFO, not after it has been transmitted. mcux_lpuart_configure() then
+	calls LPUART_Init(), which software-resets the peripheral and discards
+	any bytes still in the FIFO.
+
+	On the DEV-G2-NANO, this breaks Bluetooth bring-up. The NXP Bluetooth
+	setup driver (hci_nxp_setup.c) sends the final firmware-download ACK with
+	uart_poll_out() and immediately reconfigures the UART. The ACK is lost,
+	the IW416 stays in its ROM bootloader, and bt init fails with a 0xFC09
+	or 0x0C03 command timeout.
+
+Fix:
+	This issue was addressed in the following upstream Zephyr commits:
+		1. 1aac1518d1ca6cbc5786f7e1c25174c23552fdb7
+		2. c5469546d603d80f99935ea8416bff903a152007
+
+	This patch just applies the diff.
+
+--- a/drivers/serial/uart_mcux_lpuart.c
++++ b/drivers/serial/uart_mcux_lpuart.c
+@@ -1367,6 +1367,11 @@
+ {
+ 	const struct mcux_lpuart_config *config = dev->config;
+
++	if (!WAIT_FOR((config->base->STAT & LPUART_STAT_TC_MASK) != 0U,
++		      300U * USEC_PER_MSEC, k_busy_wait(100U))) {
++		return -EBUSY;
++	}
++
+ 	/* Disable Transmitter and Receiver */
+ 	config->base->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+
