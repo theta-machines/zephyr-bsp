@@ -1,7 +1,7 @@
 # Copyright 2026 Theta Machines
 # SPDX-License-Identifier: Apache-2.0
 
-set(CMSIS_PACK ${ZEPHYR_THETAMACHINES_MODULE_DIR}/zephyr/blobs/NXP.MIMXRT1171_DFP.26.09.00.pack)
+set(CMSIS_PACK ${ZEPHYR_THETAMACHINES_MODULE_DIR}/zephyr/blobs/NXP.MIMXRT1171_DFP.pack)
 
 if(NOT EXISTS ${CMSIS_PACK})
     message(WARNING "pyOCD pack missing; run: `west blobs fetch thetamachines`")

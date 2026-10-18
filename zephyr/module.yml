@@ -4,7 +4,10 @@ build:
     board_root: .
     dts_root: .
 blobs:
-  - path: NXP.MIMXRT1171_DFP.26.09.00.pack
+  # Download a specific CMSIS Pack for pyOCD. This ensures pyOCD can still
+  # function even when ARM's and NXP's package indexes are out of sync.
+  # For more details, see this issue: https://github.com/pyocd/pyOCD/issues/1992
+  - path: NXP.MIMXRT1171_DFP.pack
     version: '26.09.00'
     url: https://mcuxpresso.nxp.com/cmsis_pack/repo/NXP.MIMXRT1171_DFP.26.09.00.pack
     sha256: 86ebfe3935df7434ef2a31e1cc3e23840e7690f511d48678d75ab8ce39c65242

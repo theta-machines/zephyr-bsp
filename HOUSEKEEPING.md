@@ -22,6 +22,8 @@ Below is a checklist of actions to be completed when upgrading to a newer Zephyr
 4. Rerun every sample that is listed as "Officially Tested".
     * Make sure the user experience is smooth.
 
+
+
 ## Maintaining Patches
 ### No Patches
 When no patches need to be applied, the `zephyr/patches.yml` file should contain no entries under `patches`:
@@ -54,3 +56,14 @@ Be cautious of line endings! CRLF line endings will change the hash value!
 ```powershell
 (Get-FileHash path/to/file.patch).Hash.ToLower()
 ```
+
+
+
+## Updating the CMSIS Pack
+The CMSIS pack used by pyOCD is fetched as a blob. To update the pack version, modify the `zephyr/module.yml` file.
+* Update the `version` and `url` values to the latest release.
+* Update the `sha256` value (using the method described above).
+* Confirm the license is correct in `zephyr/blobs/licenses/MIMXRT1171_DFP.txt`
+    * The license file is inside the `.pack` file itself.
+    * To open the `.pack` file, simply rename the file to `.zip`.
+    * In the `.pack` file, look for `License.txt` (or similar).
