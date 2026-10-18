@@ -39,6 +39,8 @@
 
         zephyr,console = &lpuart11;
         zephyr,shell-uart = &lpuart11;
+
+        zephyr,bt-hci = &bt_hci_uart;
     };
 
     leds {
@@ -163,7 +165,7 @@
     /* 50 MHz for DDR50 mode */
     max-bus-freq = <DT_FREQ_M(50)>;
 
-    maya_w1: maya-w1 {
+    maya_w1_wifi: maya-w1-wifi {
         compatible = "nxp,wifi";
         status = "okay";
 
@@ -183,9 +185,37 @@
 /* UART channel to MAYA-W1 */
 &lpuart2 {
     status = "okay";
-    current-speed = <115200>;
+    current-speed = <3000000>;
     pinctrl-0 = <&pinmux_lpuart2>;
     pinctrl-names = "default";
+
+    bt_hci_uart: bt_hci_uart {
+        compatible = "zephyr,bt-hci-uart";
+        status = "okay";
+
+        maya_w1_bt: maya-w1-bt {
+            compatible = "nxp,bt-hci-uart";
+            status = "okay";
+
+            /*
+                Both point to the module's power down pin (PDn)
+
+                The binding requires both properties and drives both pins LOW
+                at the same time. BT_RESET is avoided because the IW416 drives
+                BT_RESET HIGH when PDn is asserted. This would cause driver
+                contention.
+            */
+            sdio-reset-gpios = <&gpio7 9 GPIO_ACTIVE_HIGH>;
+            w-disable-gpios = <&gpio7 9 GPIO_ACTIVE_HIGH>;
+
+            hci-operation-speed = <3000000>;
+            hw-flow-control;
+
+            fw-download-primary-speed = <115200>;
+            fw-download-secondary-speed = <115200>;
+            fw-download-secondary-flowcontrol;
+        };
+    };
 };
 
 /* UART channel to USB/UART bridge */

@@ -13,4 +13,13 @@ if BOARD_DEV_G2_NANO
         config NET_MGMT_EVENT_STACK_SIZE
             default 2048
     endif
+
+    choice BT_NXP_MODULE
+        default BT_NXP_IW416
+    endchoice
+
+    # Default to "no storage" for the settings subsystem
+    choice SETTINGS_BACKEND
+        default SETTINGS_NONE
+    endchoice
 endif
